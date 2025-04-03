@@ -31,7 +31,6 @@
 <div id="map"></div>
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoieGpuMjAyNSIsImEiOiJjbTkxMWJ1cTEwM3NkMm5wdnNkemE4Z24yIn0.ZDf4-d0toG_wjYNsdQvlzw';
-
 const map = new mapboxgl.Map({
   container: 'map',
   style: 'mapbox://styles/mapbox/dark-v10',
@@ -40,17 +39,17 @@ const map = new mapboxgl.Map({
 });
 
 map.on('load', () => {
-  // 添加 GeoJSON 数据源
-  map.addSource('posts', {
+  const sourceId = 'posts';
+  map.addSource(sourceId, {
     type: 'geojson',
     data: './data.geojson'
   });
 
-  // glow 层
+  // glow 层（呼吸效果）
   map.addLayer({
     id: 'posts-glow',
     type: 'circle',
-    source: 'posts',
+    source: sourceId,
     paint: {
       'circle-radius': [
         'interpolate', ['linear'], ['zoom'],
@@ -65,31 +64,15 @@ map.on('load', () => {
         '#cccccc'
       ],
       'circle-opacity': 0.1,
-      'circle-blur': 0.8
+      'circle-blur': 1.2
     }
   });
 
-  // 点击识别层
-  map.addLayer({
-    id: 'posts-clickable',
-    type: 'circle',
-    source: 'posts',
-    paint: {
-      'circle-radius': [
-        'interpolate', ['linear'], ['zoom'],
-        10, 15,
-        14, 30
-      ],
-      'circle-color': '#000000',
-      'circle-opacity': 0
-    }
-  });
-
-  // 主点层
+  // 主点（模拟泡泡质感：渐变 + 明暗 + 层次）
   map.addLayer({
     id: 'posts-main',
     type: 'circle',
-    source: 'posts',
+    source: sourceId,
     paint: {
       'circle-radius': [
         'interpolate', ['linear'], ['zoom'],
@@ -99,73 +82,52 @@ map.on('load', () => {
       'circle-color': [
         'match',
         ['get', 'type'],
-        '心愿', '#66ccff',
-        '找人', '#ffdd33',
+        '心愿', '#aeeaff',  // 泡泡蓝（略偏亮）
+        '找人', '#ffee88',
         '#ffffff'
       ],
-      'circle-opacity': 0.95,
-      'circle-blur': 0.1
+      'circle-opacity': 0.9,
+      'circle-blur': 0.05,
+      'circle-stroke-color': '#ffffff',
+      'circle-stroke-width': 0.4
     }
   });
 
-  // ⭐️ 珠光高光：位置随机 + 透明 + 细
+  // 点击识别层
   map.addLayer({
-    id: 'posts-highlight',
+    id: 'posts-click',
     type: 'circle',
-    source: 'posts',
+    source: sourceId,
     paint: {
-      'circle-radius': 2.5,
-      'circle-color': '#ffffff',
-      'circle-opacity': 0.15
+      'circle-radius': 20,
+      'circle-color': '#000000',
+      'circle-opacity': 0
     }
   });
 
-  // 添加点动画状态
-  const features = map.getSource('posts')._data.features;
-  features.forEach((feature, i) => {
-    const id = i;
-    const offset = Math.random() * 2 * Math.PI;
-    const speed = 0.001 + Math.random() * 0.0015;
-    const likes = feature.properties.likes || 0;
-    const baseOpacity = Math.min(0.05 + likes * 0.05, 0.6);
-    map.setFeatureState({ source: 'posts', id }, {
-      offset, speed, baseOpacity,
-      tx: Math.random() * 3 - 1.5,
-      ty: Math.random() * 3 - 1.5
+  // 动态光圈逻辑（每个点有呼吸节奏 + likes 控制 base）
+  const features = map.getSource(sourceId)._data.features;
+  features.forEach((f, i) => {
+    map.setFeatureState({ source: sourceId, id: f.id }, {
+      base: Math.min(0.05 + (f.properties.likes || 0) * 0.05, 0.6),
+      offset: Math.random() * 1000,
+      speed: 0.001 + Math.random() * 0.0015
     });
   });
 
-  // 珠光偏移（每帧更新）
-  setInterval(() => {
-    const states = features.map((f, i) => map.getFeatureState({ source: 'posts', id: i }));
-    const translateArray = states.map(s => [s.tx, s.ty]);
-    map.setPaintProperty('posts-highlight', 'circle-translate', ['literal', translateArray]);
-  }, 100);
-
-  // 呼吸动画
-  function animateGlow(t) {
-    features.forEach((f, i) => {
-      const s = map.getFeatureState({ source: 'posts', id: i });
-      if (s) {
-        const breath = 0.5 + 0.5 * Math.sin(t * s.speed + s.offset);
-        const glowOpacity = Math.min(1.0, s.baseOpacity * breath);
-        map.setFeatureState({ source: 'posts', id: i }, { ...s, glowOpacity });
-      }
-    });
-
-    const opacities = features.map((f, i) => {
-      const s = map.getFeatureState({ source: 'posts', id: i });
-      return s ? s.glowOpacity : 0.1;
+  function animate(t) {
+    const opacities = features.map((f) => {
+      const state = map.getFeatureState({ source: sourceId, id: f.id });
+      const osc = 0.5 + 0.5 * Math.sin(t * state.speed + state.offset);
+      return +(state.base * osc).toFixed(3);
     });
     map.setPaintProperty('posts-glow', 'circle-opacity', ['literal', opacities]);
-
-    requestAnimationFrame(animateGlow);
+    requestAnimationFrame(animate);
   }
+  animate(0);
 
-  animateGlow(0);
-
-  // Popup + 心跳
-  map.on('click', 'posts-clickable', (e) => {
+  // 点击气泡 + Popup
+  map.on('click', 'posts-click', (e) => {
     const props = e.features[0].properties;
     const center = map.project(e.lngLat);
     const type = props.type;
@@ -184,10 +146,10 @@ map.on('load', () => {
       .addTo(map);
   });
 
-  map.on('mouseenter', 'posts-clickable', () => {
+  map.on('mouseenter', 'posts-click', () => {
     map.getCanvas().style.cursor = 'pointer';
   });
-  map.on('mouseleave', 'posts-clickable', () => {
+  map.on('mouseleave', 'posts-click', () => {
     map.getCanvas().style.cursor = '';
   });
 });
