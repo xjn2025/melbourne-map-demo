@@ -10,7 +10,6 @@
     body { margin: 0; padding: 0; background: #000; overflow: hidden; }
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
 
-    /* 心跳动画泡泡 */
     .heartbeat {
       position: absolute;
       width: 100px;
@@ -33,89 +32,125 @@
 <body>
 <div id="map"></div>
 <script>
-  mapboxgl.accessToken = 'pk.eyJ1IjoieGpuMjAyNSIsImEiOiJjbTkxMWJ1cTEwM3NkMm5wdnNkemE4Z24yIn0.ZDf4-d0toG_wjYNsdQvlzw';
+mapboxgl.accessToken = 'pk.eyJ1IjoieGpuMjAyNSIsImEiOiJjbTkxMWJ1cTEwM3NkMm5wdnNkemE4Z24yIn0.ZDf4-d0toG_wjYNsdQvlzw';
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/dark-v10',
+  center: [144.9631, -37.8136],
+  zoom: 12
+});
 
-  const map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/dark-v10',
-    center: [144.9631, -37.8136],
-    zoom: 12
+map.on('load', () => {
+  map.addSource('posts', {
+    type: 'geojson',
+    data: './data.geojson'
   });
 
-  map.on('load', () => {
-    map.addSource('posts', {
-      type: 'geojson',
-      data: './data.geojson'
-    });
-
-    // 🌟 Glow 发光光圈缩小为 45
-    map.addLayer({
-      id: 'posts-glow',
-      type: 'circle',
-      source: 'posts',
-      paint: {
-        'circle-radius': 45,
-        'circle-color': [
-          'match',
-          ['get', 'type'],
-          '心愿', '#66ccff',
-          '找人', '#ffdd33',
-          '#cccccc'
-        ],
-        'circle-opacity': 0.25,
-        'circle-blur': 0.7
-      }
-    });
-
-    // 📍 主圆点（增加立体感）
-    map.addLayer({
-      id: 'posts',
-      type: 'circle',
-      source: 'posts',
-      paint: {
-        'circle-radius': 10,
-        'circle-color': [
-          'match',
-          ['get', 'type'],
-          '心愿', '#66ccff',
-          '找人', '#ffdd33',
-          '#ffffff'
-        ],
-        'circle-opacity': 0.95,
-        'circle-blur': 0.1,
-        'circle-stroke-color': '#ffffff',
-        'circle-stroke-width': 1.2
-      }
-    });
-
-    // 💓 点击心跳泡泡
-    map.on('click', 'posts', (e) => {
-      const props = e.features[0].properties;
-      const center = map.project(e.lngLat);
-      const type = props.type;
-
-      const heart = document.createElement('div');
-      heart.className = 'heartbeat';
-      heart.style.left = `${center.x}px`;
-      heart.style.top = `${center.y}px`;
-      heart.style.background = type === '心愿' ? '#66ccff55' : '#ffdd3355';
-      document.body.appendChild(heart);
-
-      setTimeout(() => heart.remove(), 600);
-
-      new mapboxgl.Popup()
-        .setLngLat(e.lngLat)
-        .setHTML(`<strong>${props.title}</strong><br>${props.content}`)
-        .addTo(map);
-    });
-
-    map.on('mouseenter', 'posts', () => {
-      map.getCanvas().style.cursor = 'pointer';
-    });
-    map.on('mouseleave', 'posts', () => {
-      map.getCanvas().style.cursor = '';
-    });
+  // 🌟 发光 glow 层（动态缩放）
+  map.addLayer({
+    id: 'posts-glow',
+    type: 'circle',
+    source: 'posts',
+    paint: {
+      'circle-radius': [
+        'interpolate', ['linear'], ['zoom'],
+        10, 20,
+        14, 45
+      ],
+      'circle-color': [
+        'match',
+        ['get', 'type'],
+        '心愿', '#66ccff',
+        '找人', '#ffdd33',
+        '#cccccc'
+      ],
+      'circle-opacity': 0.2,
+      'circle-blur': 0.8
+    }
   });
+
+  // 🎯 点击识别层（扩大范围、透明）
+  map.addLayer({
+    id: 'posts-clickable',
+    type: 'circle',
+    source: 'posts',
+    paint: {
+      'circle-radius': [
+        'interpolate', ['linear'], ['zoom'],
+        10, 15,
+        14, 30
+      ],
+      'circle-color': '#000000',
+      'circle-opacity': 0
+    }
+  });
+
+  // 📍 主圆点层（视觉主角）
+  map.addLayer({
+    id: 'posts-main',
+    type: 'circle',
+    source: 'posts',
+    paint: {
+      'circle-radius': [
+        'interpolate', ['linear'], ['zoom'],
+        10, 6,
+        14, 10
+      ],
+      'circle-color': [
+        'match',
+        ['get', 'type'],
+        '心愿', '#66ccff',
+        '找人', '#ffdd33',
+        '#ffffff'
+      ],
+      'circle-opacity': 0.95,
+      'circle-blur': 0.1
+    }
+  });
+
+  // ✨ 高光点层（模拟珠光感）
+  map.addLayer({
+    id: 'posts-highlight',
+    type: 'circle',
+    source: 'posts',
+    paint: {
+      'circle-radius': [
+        'interpolate', ['linear'], ['zoom'],
+        10, 2,
+        14, 4
+      ],
+      'circle-color': '#ffffff',
+      'circle-opacity': 0.6
+    }
+  });
+
+  // 💓 心跳动画 + 弹窗绑定到“点击识别层”
+  map.on('click', 'posts-clickable', (e) => {
+    const props = e.features[0].properties;
+    const center = map.project(e.lngLat);
+    const type = props.type;
+
+    const heart = document.createElement('div');
+    heart.className = 'heartbeat';
+    heart.style.left = `${center.x}px`;
+    heart.style.top = `${center.y}px`;
+    heart.style.background = type === '心愿' ? '#66ccff55' : '#ffdd3355';
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 600);
+
+    new mapboxgl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(`<strong>${props.title}</strong><br>${props.content}`)
+      .addTo(map);
+  });
+
+  map.on('mouseenter', 'posts-clickable', () => {
+    map.getCanvas().style.cursor = 'pointer';
+  });
+  map.on('mouseleave', 'posts-clickable', () => {
+    map.getCanvas().style.cursor = '';
+  });
+});
 </script>
 </body>
 </html>
