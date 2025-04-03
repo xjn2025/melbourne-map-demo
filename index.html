@@ -28,13 +28,13 @@
       data: './data.geojson'
     });
 
-    // ✨ Glow layer for soft lighting effect
+    // 发光图层（柔光 halo）
     map.addLayer({
       id: 'posts-glow',
       type: 'circle',
       source: 'posts',
       paint: {
-        'circle-radius': 18,
+        'circle-radius': 20,
         'circle-color': [
           'match',
           ['get', 'type'],
@@ -43,17 +43,17 @@
           '#cccccc'
         ],
         'circle-opacity': 0.25,
-        'circle-blur': 1.2
+        'circle-blur': 0.8
       }
     });
 
-    // 🌸 Main point layer
+    // 主点图层（更大、更亮）
     map.addLayer({
       id: 'posts',
       type: 'circle',
       source: 'posts',
       paint: {
-        'circle-radius': 8,
+        'circle-radius': 10,
         'circle-color': [
           'match',
           ['get', 'type'],
@@ -61,12 +61,12 @@
           '缘分', '#ff4444',
           '#ffffff'
         ],
-        'circle-opacity': 0.9,
-        'circle-blur': 0.2
+        'circle-opacity': 0.95,
+        'circle-blur': 0.1
       }
     });
 
-    // Popup interaction
+    // 弹出卡片
     map.on('click', 'posts', (e) => {
       const props = e.features[0].properties;
       new mapboxgl.Popup()
