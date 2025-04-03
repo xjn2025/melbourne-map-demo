@@ -7,8 +7,29 @@
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
   <style>
-    body { margin: 0; padding: 0; }
+    body { margin: 0; padding: 0; background: #000; }
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+    /* 💓 心跳泡泡 CSS 动画 */
+    .mapboxgl-canvas {
+      animation: fadeIn 1.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* 用于 hover 时缩放效果 */
+    .mapboxgl-popup {
+      animation: pulse 0.8s ease-in-out;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
   </style>
 </head>
 <body>
@@ -28,13 +49,13 @@
       data: './data.geojson'
     });
 
-    // 发光图层（柔光 halo）
+    // ✨ Glow 图层（超大光圈）
     map.addLayer({
       id: 'posts-glow',
       type: 'circle',
       source: 'posts',
       paint: {
-        'circle-radius': 20,
+        'circle-radius': 60,
         'circle-color': [
           'match',
           ['get', 'type'],
@@ -42,12 +63,12 @@
           '缘分', '#ff9999',
           '#cccccc'
         ],
-        'circle-opacity': 0.25,
-        'circle-blur': 0.8
+        'circle-opacity': 0.35,
+        'circle-blur': 1.2
       }
     });
 
-    // 主点图层（更大、更亮）
+    // 🌸 主点图层（点加载动画）
     map.addLayer({
       id: 'posts',
       type: 'circle',
@@ -61,15 +82,20 @@
           '缘分', '#ff4444',
           '#ffffff'
         ],
-        'circle-opacity': 0.95,
+        'circle-opacity': 0, // 初始透明
         'circle-blur': 0.1
       }
     });
 
-    // 弹出卡片
+    // ⏳ 淡入动画：逐渐显示点
+    setTimeout(() => {
+      map.setPaintProperty('posts', 'circle-opacity', 0.95);
+    }, 300); // 300ms 后开始淡入
+
+    // 🧡 弹出气泡（带缩放动画）
     map.on('click', 'posts', (e) => {
       const props = e.features[0].properties;
-      new mapboxgl.Popup()
+      new mapboxgl.Popup({ closeButton: true })
         .setLngLat(e.lngLat)
         .setHTML(`<strong>${props.title}</strong><br>${props.content}`)
         .addTo(map);
