@@ -10,7 +10,7 @@
     body { margin: 0; padding: 0; background: #000; overflow: hidden; }
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
 
-    /* 心跳动画样式（彩色气泡） */
+    /* 心跳动画泡泡 */
     .heartbeat {
       position: absolute;
       width: 100px;
@@ -48,13 +48,13 @@
       data: './data.geojson'
     });
 
-    // 🌟 Glow 光晕层（90px）
+    // 🌟 Glow 发光光圈缩小为 45
     map.addLayer({
       id: 'posts-glow',
       type: 'circle',
       source: 'posts',
       paint: {
-        'circle-radius': 90,
+        'circle-radius': 45,
         'circle-color': [
           'match',
           ['get', 'type'],
@@ -63,11 +63,11 @@
           '#cccccc'
         ],
         'circle-opacity': 0.25,
-        'circle-blur': 0.8
+        'circle-blur': 0.7
       }
     });
 
-    // 📍 主圆点层
+    // 📍 主圆点（增加立体感）
     map.addLayer({
       id: 'posts',
       type: 'circle',
@@ -82,11 +82,13 @@
           '#ffffff'
         ],
         'circle-opacity': 0.95,
-        'circle-blur': 0.1
+        'circle-blur': 0.1,
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-width': 1.2
       }
     });
 
-    // 💓 点击动画 + 弹窗
+    // 💓 点击心跳泡泡
     map.on('click', 'posts', (e) => {
       const props = e.features[0].properties;
       const center = map.project(e.lngLat);
