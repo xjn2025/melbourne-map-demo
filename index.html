@@ -10,25 +10,23 @@
     body { margin: 0; padding: 0; background: #000; overflow: hidden; }
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
 
-    /* 心跳动画 */
+    /* 心跳动画样式（彩色气泡） */
     .heartbeat {
       position: absolute;
-      width: 80px;
-      height: 80px;
-      background: rgba(255,255,255,0.15);
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      animation: beat 0.5s ease-out;
+      opacity: 0.5;
+      transform: translate(-50%, -50%) scale(1);
+      animation: pulse 0.6s ease-out forwards;
       pointer-events: none;
       z-index: 999;
     }
 
-    @keyframes beat {
-      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.8; }
-      50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.4; }
-      100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+    @keyframes pulse {
+      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.3; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
     }
   </style>
 </head>
@@ -50,13 +48,13 @@
       data: './data.geojson'
     });
 
-    // 💡 Glow 发光圈（大 halo）
+    // 🌟 Glow 光晕层（90px）
     map.addLayer({
       id: 'posts-glow',
       type: 'circle',
       source: 'posts',
       paint: {
-        'circle-radius': 180,
+        'circle-radius': 90,
         'circle-color': [
           'match',
           ['get', 'type'],
@@ -64,12 +62,12 @@
           '找人', '#ffdd33',
           '#cccccc'
         ],
-        'circle-opacity': 0.2,
-        'circle-blur': 1.2
+        'circle-opacity': 0.25,
+        'circle-blur': 0.8
       }
     });
 
-    // 📍 主圆圈（不变大）
+    // 📍 主圆点层
     map.addLayer({
       id: 'posts',
       type: 'circle',
@@ -88,18 +86,20 @@
       }
     });
 
-    // 💓 点击时心跳动画 + 弹窗
+    // 💓 点击动画 + 弹窗
     map.on('click', 'posts', (e) => {
       const props = e.features[0].properties;
       const center = map.project(e.lngLat);
+      const type = props.type;
 
       const heart = document.createElement('div');
       heart.className = 'heartbeat';
       heart.style.left = `${center.x}px`;
       heart.style.top = `${center.y}px`;
+      heart.style.background = type === '心愿' ? '#66ccff55' : '#ffdd3355';
       document.body.appendChild(heart);
 
-      setTimeout(() => heart.remove(), 500); // 动画后移除
+      setTimeout(() => heart.remove(), 600);
 
       new mapboxgl.Popup()
         .setLngLat(e.lngLat)
@@ -110,7 +110,6 @@
     map.on('mouseenter', 'posts', () => {
       map.getCanvas().style.cursor = 'pointer';
     });
-
     map.on('mouseleave', 'posts', () => {
       map.getCanvas().style.cursor = '';
     });
