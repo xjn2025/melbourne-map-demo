@@ -46,7 +46,7 @@ map.on('load', () => {
     data: './data.geojson'
   });
 
-  // 🌟 发光 glow 层（动态缩放）
+  // 🌟 呼吸感 Glow 光圈（初始）
   map.addLayer({
     id: 'posts-glow',
     type: 'circle',
@@ -69,7 +69,7 @@ map.on('load', () => {
     }
   });
 
-  // 🎯 点击识别层（扩大范围、透明）
+  // 📍 点击识别层（透明但扩大点击范围）
   map.addLayer({
     id: 'posts-clickable',
     type: 'circle',
@@ -85,7 +85,7 @@ map.on('load', () => {
     }
   });
 
-  // 📍 主圆点层（视觉主角）
+  // 📍 主点（气泡本体）
   map.addLayer({
     id: 'posts-main',
     type: 'circle',
@@ -108,7 +108,7 @@ map.on('load', () => {
     }
   });
 
-  // ✨ 高光点层（模拟珠光感）
+  // 🫧 偏移高光层（模拟“侧面珠光感”）
   map.addLayer({
     id: 'posts-highlight',
     type: 'circle',
@@ -120,11 +120,12 @@ map.on('load', () => {
         14, 4
       ],
       'circle-color': '#ffffff',
-      'circle-opacity': 0.6
+      'circle-opacity': 0.3,
+      'circle-translate': [1.2, -1.2]
     }
   });
 
-  // 💓 心跳动画 + 弹窗绑定到“点击识别层”
+  // 💓 点击心跳动画
   map.on('click', 'posts-clickable', (e) => {
     const props = e.features[0].properties;
     const center = map.project(e.lngLat);
@@ -150,6 +151,14 @@ map.on('load', () => {
   map.on('mouseleave', 'posts-clickable', () => {
     map.getCanvas().style.cursor = '';
   });
+
+  // 🌬 呼吸动画逻辑：循环调整 glow 透明度
+  let fading = true;
+  setInterval(() => {
+    const opacity = fading ? 0.08 : 0.2;
+    map.setPaintProperty('posts-glow', 'circle-opacity', opacity);
+    fading = !fading;
+  }, 2000);
 });
 </script>
 </body>
