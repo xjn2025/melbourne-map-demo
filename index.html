@@ -45,7 +45,7 @@ map.on('load', () => {
     data: './data.geojson'
   });
 
-  // glow 层（呼吸效果）
+  // glow 层
   map.addLayer({
     id: 'posts-glow',
     type: 'circle',
@@ -63,12 +63,12 @@ map.on('load', () => {
         '找人', '#ffdd33',
         '#cccccc'
       ],
-      'circle-opacity': 0.1,
+      'circle-opacity': 0.2,
       'circle-blur': 1.2
     }
   });
 
-  // 主点（模拟泡泡质感：渐变 + 明暗 + 层次）
+  // 主点（泡泡质感）
   map.addLayer({
     id: 'posts-main',
     type: 'circle',
@@ -82,34 +82,33 @@ map.on('load', () => {
       'circle-color': [
         'match',
         ['get', 'type'],
-        '心愿', '#aeeaff',  // 泡泡蓝（略偏亮）
+        '心愿', '#aeeaff',
         '找人', '#ffee88',
         '#ffffff'
       ],
-      'circle-opacity': 0.9,
-      'circle-blur': 0.05,
-      'circle-stroke-color': '#ffffff',
-      'circle-stroke-width': 0.4
+      'circle-opacity': 0.95,
+      'circle-blur': 0.05
     }
   });
 
-  // 点击识别层
+  // 高光点（模拟泡泡珠光）
   map.addLayer({
-    id: 'posts-click',
+    id: 'posts-highlight',
     type: 'circle',
     source: sourceId,
     paint: {
-      'circle-radius': 20,
-      'circle-color': '#000000',
-      'circle-opacity': 0
+      'circle-radius': 2.5,
+      'circle-color': '#ffffff',
+      'circle-opacity': 0.25,
+      'circle-translate': [2, -2]
     }
   });
 
-  // 动态光圈逻辑（每个点有呼吸节奏 + likes 控制 base）
+  // 设置每个点的状态（for 呼吸）
   const features = map.getSource(sourceId)._data.features;
   features.forEach((f, i) => {
     map.setFeatureState({ source: sourceId, id: f.id }, {
-      base: Math.min(0.05 + (f.properties.likes || 0) * 0.05, 0.6),
+      base: Math.min(0.1 + (f.properties.likes || 0) * 0.07, 0.6),
       offset: Math.random() * 1000,
       speed: 0.001 + Math.random() * 0.0015
     });
@@ -117,17 +116,17 @@ map.on('load', () => {
 
   function animate(t) {
     const opacities = features.map((f) => {
-      const state = map.getFeatureState({ source: sourceId, id: f.id });
-      const osc = 0.5 + 0.5 * Math.sin(t * state.speed + state.offset);
-      return +(state.base * osc).toFixed(3);
+      const s = map.getFeatureState({ source: sourceId, id: f.id });
+      const osc = 0.5 + 0.5 * Math.sin(t * s.speed + s.offset);
+      return +(s.base * osc).toFixed(3);
     });
     map.setPaintProperty('posts-glow', 'circle-opacity', ['literal', opacities]);
     requestAnimationFrame(animate);
   }
   animate(0);
 
-  // 点击气泡 + Popup
-  map.on('click', 'posts-click', (e) => {
+  // 点击绑定
+  map.on('click', 'posts-main', (e) => {
     const props = e.features[0].properties;
     const center = map.project(e.lngLat);
     const type = props.type;
@@ -144,13 +143,6 @@ map.on('load', () => {
       .setLngLat(e.lngLat)
       .setHTML(`<strong>${props.title}</strong><br>${props.content}`)
       .addTo(map);
-  });
-
-  map.on('mouseenter', 'posts-click', () => {
-    map.getCanvas().style.cursor = 'pointer';
-  });
-  map.on('mouseleave', 'posts-click', () => {
-    map.getCanvas().style.cursor = '';
   });
 });
 </script>
