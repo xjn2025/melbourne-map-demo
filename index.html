@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,12 +9,6 @@
   <style>
     body { margin: 0; padding: 0; }
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
-    .marker {
-      background: radial-gradient(circle at center, rgba(255,100,150,0.8) 0%, rgba(0,0,0,0) 70%);
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-    }
   </style>
 </head>
 <body>
@@ -35,6 +28,26 @@
       data: './data.geojson'
     });
 
+    // ✨ Glow layer for soft lighting effect
+    map.addLayer({
+      id: 'posts-glow',
+      type: 'circle',
+      source: 'posts',
+      paint: {
+        'circle-radius': 18,
+        'circle-color': [
+          'match',
+          ['get', 'type'],
+          '感悟', '#ffb6d2',
+          '缘分', '#ff9999',
+          '#cccccc'
+        ],
+        'circle-opacity': 0.25,
+        'circle-blur': 1.2
+      }
+    });
+
+    // 🌸 Main point layer
     map.addLayer({
       id: 'posts',
       type: 'circle',
@@ -48,10 +61,12 @@
           '缘分', '#ff4444',
           '#ffffff'
         ],
-        'circle-opacity': 0.8
+        'circle-opacity': 0.9,
+        'circle-blur': 0.2
       }
     });
 
+    // Popup interaction
     map.on('click', 'posts', (e) => {
       const props = e.features[0].properties;
       new mapboxgl.Popup()
