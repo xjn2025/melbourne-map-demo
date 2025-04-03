@@ -1,0 +1,165 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "夜晚的高空",
+        "content": "站在Skydeck，思念某个曾经的TA。",
+        "place": "Melbourne Skydeck",
+        "type": "感悟"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.964374,
+          -37.817979
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "第一次约会",
+        "content": "MCG 是我们看球赛的地方。",
+        "place": "Melbourne Cricket Ground",
+        "type": "缘分"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.983449,
+          -37.819967
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "沉静的时刻",
+        "content": "独自在皇家花园走了一圈，想起家人。",
+        "place": "Royal Botanic Gardens",
+        "type": "感悟"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.979622,
+          -37.831373
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "走失的朋友",
+        "content": "当年在联邦广场偶遇，现在不知他在哪。",
+        "place": "Federation Square",
+        "type": "缘分"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.969091,
+          -37.817979
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "深夜的市场",
+        "content": "在QVM买草莓的那个她，后来再没见过。",
+        "place": "Queen Victoria Market",
+        "type": "缘分"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.956768,
+          -37.806053
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "无声的记忆",
+        "content": "监狱墙外，我写下心事。",
+        "place": "Old Melbourne Gaol",
+        "type": "感悟"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.965292,
+          -37.807777
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "街头教堂前",
+        "content": "圣保罗大教堂旁，我等了很久。",
+        "place": "St Paul's Cathedral",
+        "type": "缘分"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.967073,
+          -37.817523
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "火车站的黄灯",
+        "content": "每天路过，却再没遇见你。",
+        "place": "Flinders Street Station",
+        "type": "缘分"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.967061,
+          -37.818271
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "彩绘墙下",
+        "content": "Hosier Lane的留言墙上，也许还有我的名字。",
+        "place": "Hosier Lane",
+        "type": "感悟"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.969057,
+          -37.816711
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "博物馆门口",
+        "content": "那天我们聊了好久。",
+        "place": "Melbourne Museum",
+        "type": "缘分"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.971778,
+          -37.803444
+        ]
+      }
+    }
+  ]
+}
