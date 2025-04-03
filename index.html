@@ -9,7 +9,6 @@
   <style>
     body { margin: 0; padding: 0; background: #000; overflow: hidden; }
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
-
     .heartbeat {
       position: absolute;
       width: 100px;
@@ -21,7 +20,6 @@
       pointer-events: none;
       z-index: 999;
     }
-
     @keyframes pulse {
       0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
       50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.3; }
@@ -33,6 +31,7 @@
 <div id="map"></div>
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoieGpuMjAyNSIsImEiOiJjbTkxMWJ1cTEwM3NkMm5wdnNkemE4Z24yIn0.ZDf4-d0toG_wjYNsdQvlzw';
+
 const map = new mapboxgl.Map({
   container: 'map',
   style: 'mapbox://styles/mapbox/dark-v10',
@@ -41,12 +40,13 @@ const map = new mapboxgl.Map({
 });
 
 map.on('load', () => {
+  // 添加 GeoJSON 数据源
   map.addSource('posts', {
     type: 'geojson',
     data: './data.geojson'
   });
 
-  // 🌟 呼吸感 Glow 光圈（初始）
+  // glow 层
   map.addLayer({
     id: 'posts-glow',
     type: 'circle',
@@ -64,12 +64,12 @@ map.on('load', () => {
         '找人', '#ffdd33',
         '#cccccc'
       ],
-      'circle-opacity': 0.2,
+      'circle-opacity': 0.1,
       'circle-blur': 0.8
     }
   });
 
-  // 📍 点击识别层（透明但扩大点击范围）
+  // 点击识别层
   map.addLayer({
     id: 'posts-clickable',
     type: 'circle',
@@ -85,7 +85,7 @@ map.on('load', () => {
     }
   });
 
-  // 📍 主点（气泡本体）
+  // 主点层
   map.addLayer({
     id: 'posts-main',
     type: 'circle',
@@ -108,24 +108,63 @@ map.on('load', () => {
     }
   });
 
-  // 🫧 偏移高光层（模拟“侧面珠光感”）
+  // ⭐️ 珠光高光：位置随机 + 透明 + 细
   map.addLayer({
     id: 'posts-highlight',
     type: 'circle',
     source: 'posts',
     paint: {
-      'circle-radius': [
-        'interpolate', ['linear'], ['zoom'],
-        10, 2,
-        14, 4
-      ],
+      'circle-radius': 2.5,
       'circle-color': '#ffffff',
-      'circle-opacity': 0.3,
-      'circle-translate': [1.2, -1.2]
+      'circle-opacity': 0.15
     }
   });
 
-  // 💓 点击心跳动画
+  // 添加点动画状态
+  const features = map.getSource('posts')._data.features;
+  features.forEach((feature, i) => {
+    const id = i;
+    const offset = Math.random() * 2 * Math.PI;
+    const speed = 0.001 + Math.random() * 0.0015;
+    const likes = feature.properties.likes || 0;
+    const baseOpacity = Math.min(0.05 + likes * 0.05, 0.6);
+    map.setFeatureState({ source: 'posts', id }, {
+      offset, speed, baseOpacity,
+      tx: Math.random() * 3 - 1.5,
+      ty: Math.random() * 3 - 1.5
+    });
+  });
+
+  // 珠光偏移（每帧更新）
+  setInterval(() => {
+    const states = features.map((f, i) => map.getFeatureState({ source: 'posts', id: i }));
+    const translateArray = states.map(s => [s.tx, s.ty]);
+    map.setPaintProperty('posts-highlight', 'circle-translate', ['literal', translateArray]);
+  }, 100);
+
+  // 呼吸动画
+  function animateGlow(t) {
+    features.forEach((f, i) => {
+      const s = map.getFeatureState({ source: 'posts', id: i });
+      if (s) {
+        const breath = 0.5 + 0.5 * Math.sin(t * s.speed + s.offset);
+        const glowOpacity = Math.min(1.0, s.baseOpacity * breath);
+        map.setFeatureState({ source: 'posts', id: i }, { ...s, glowOpacity });
+      }
+    });
+
+    const opacities = features.map((f, i) => {
+      const s = map.getFeatureState({ source: 'posts', id: i });
+      return s ? s.glowOpacity : 0.1;
+    });
+    map.setPaintProperty('posts-glow', 'circle-opacity', ['literal', opacities]);
+
+    requestAnimationFrame(animateGlow);
+  }
+
+  animateGlow(0);
+
+  // Popup + 心跳
   map.on('click', 'posts-clickable', (e) => {
     const props = e.features[0].properties;
     const center = map.project(e.lngLat);
@@ -151,14 +190,6 @@ map.on('load', () => {
   map.on('mouseleave', 'posts-clickable', () => {
     map.getCanvas().style.cursor = '';
   });
-
-  // 🌬 呼吸动画逻辑：循环调整 glow 透明度
-  let fading = true;
-  setInterval(() => {
-    const opacity = fading ? 0.08 : 0.2;
-    map.setPaintProperty('posts-glow', 'circle-opacity', opacity);
-    fading = !fading;
-  }, 2000);
 });
 </script>
 </body>
