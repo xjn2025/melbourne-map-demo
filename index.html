@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>情绪地图 · 黑胶唱片版</title>
+  <title>情绪地图 · 黑胶唱片精致版</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
@@ -29,31 +29,33 @@
     }
 
     .vinyl {
-      width: 36px;
-      height: 36px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      background: radial-gradient(circle, #111 50%, #000 100%);
+      background: radial-gradient(circle at center, #222 40%, #000 100%);
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      box-shadow: 0 0 0 6px #fff0; /* default */
     }
 
     .vinyl.心语碟 {
-      box-shadow: 0 0 12px 4px #ffdd33aa;
+      box-shadow: 0 0 0 6px #ffdd33aa;
     }
 
     .vinyl.心愿碟 {
-      box-shadow: 0 0 12px 4px #66ccffaa;
+      box-shadow: 0 0 0 6px #66ccffaa;
     }
 
-    .vinyl::after {
+    .vinyl::before {
       content: "";
       position: absolute;
-      width: 8px;
-      height: 8px;
-      background: red;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
+      border: 2px solid #991111;
+      background: transparent;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       z-index: 2;
     }
   </style>
@@ -80,12 +82,17 @@ map.on('load', () => {
         const el = document.createElement('div');
         el.className = 'vinyl ' + props.type;
 
-        el.addEventListener('click', () => {
-          const screenPos = map.project(coords);
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+
+          const bounds = el.getBoundingClientRect();
+          const x = bounds.left + bounds.width / 2;
+          const y = bounds.top + bounds.height / 2;
+
           const heart = document.createElement('div');
           heart.className = 'heartbeat';
-          heart.style.left = `${screenPos.x}px`;
-          heart.style.top = `${screenPos.y}px`;
+          heart.style.left = `${x}px`;
+          heart.style.top = `${y}px`;
           heart.style.background = props.type === '心愿碟' ? '#66ccff55' : '#ffdd3355';
           document.body.appendChild(heart);
           setTimeout(() => heart.remove(), 600);
