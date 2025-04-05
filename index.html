@@ -1,29 +1,49 @@
-
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Emotion Map - Vinyl Style</title>
+  <title>Vinyl Emotion Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
   <style>
     body { margin: 0; padding: 0; background: #000; }
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
-    .vinyl-marker {
+    .vinyl {
       width: 40px;
       height: 40px;
-      background: url('https://upload.wikimedia.org/wikipedia/commons/3/3e/Vinyl_record_icon.png') no-repeat center center;
-      background-size: contain;
+      background: url('https://upload.wikimedia.org/wikipedia/commons/3/3e/Vinyl_record_icon.png') no-repeat center;
+      background-size: cover;
       border-radius: 50%;
-      box-shadow: 0 0 30px rgba(255, 255, 100, 0.6), 0 0 30px rgba(100, 200, 255, 0.6);
+      position: relative;
       transition: transform 0.5s linear;
     }
-    .vinyl-marker.spin {
-      animation: spin 1s linear infinite;
+    .vinyl::before {
+      content: "";
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      top: -20px;
+      left: -20px;
+      z-index: -1;
+      animation: pulse 2.5s infinite ease-in-out;
+    }
+    .vinyl.心语碟::before {
+      background: radial-gradient(circle, rgba(255,255,0,0.5), rgba(0,0,0,0));
+    }
+    .vinyl.心愿碟::before {
+      background: radial-gradient(circle, rgba(100,200,255,0.5), rgba(0,0,0,0));
+    }
+    .vinyl.spin {
+      animation: spin 1.2s linear infinite;
     }
     @keyframes spin {
-      100% { transform: rotate(360deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.4); opacity: 0.2; }
     }
   </style>
 </head>
@@ -43,7 +63,7 @@
     .then(data => {
       data.features.forEach(feature => {
         const el = document.createElement('div');
-        el.className = 'vinyl-marker';
+        el.className = 'vinyl ' + feature.properties.type;
         el.addEventListener('click', () => {
           el.classList.add('spin');
           new mapboxgl.Popup()

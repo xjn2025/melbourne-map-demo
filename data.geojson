@@ -5,11 +5,160 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [144.9631, -37.8136]
+        "coordinates": [
+          144.9631,
+          -37.8136
+        ]
       },
       "properties": {
-        "title": "一张唱片",
-        "content": "这是一个心愿帖，来自墨尔本的夜晚"
+        "title": "心语碟 1",
+        "content": "这是第 1 个来自墨尔本的 心语碟",
+        "type": "心语碟",
+        "likes": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.965,
+          -37.81
+        ]
+      },
+      "properties": {
+        "title": "心愿碟 2",
+        "content": "这是第 2 个来自墨尔本的 心愿碟",
+        "type": "心愿碟",
+        "likes": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.96,
+          -37.82
+        ]
+      },
+      "properties": {
+        "title": "心语碟 3",
+        "content": "这是第 3 个来自墨尔本的 心语碟",
+        "type": "心语碟",
+        "likes": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.97,
+          -37.815
+        ]
+      },
+      "properties": {
+        "title": "心愿碟 4",
+        "content": "这是第 4 个来自墨尔本的 心愿碟",
+        "type": "心愿碟",
+        "likes": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.955,
+          -37.8175
+        ]
+      },
+      "properties": {
+        "title": "心语碟 5",
+        "content": "这是第 5 个来自墨尔本的 心语碟",
+        "type": "心语碟",
+        "likes": 9
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.968,
+          -37.812
+        ]
+      },
+      "properties": {
+        "title": "心愿碟 6",
+        "content": "这是第 6 个来自墨尔本的 心愿碟",
+        "type": "心愿碟",
+        "likes": 11
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.9615,
+          -37.816
+        ]
+      },
+      "properties": {
+        "title": "心语碟 7",
+        "content": "这是第 7 个来自墨尔本的 心语碟",
+        "type": "心语碟",
+        "likes": 13
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.958,
+          -37.819
+        ]
+      },
+      "properties": {
+        "title": "心愿碟 8",
+        "content": "这是第 8 个来自墨尔本的 心愿碟",
+        "type": "心愿碟",
+        "likes": 15
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.966,
+          -37.811
+        ]
+      },
+      "properties": {
+        "title": "心语碟 9",
+        "content": "这是第 9 个来自墨尔本的 心语碟",
+        "type": "心语碟",
+        "likes": 17
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          144.9645,
+          -37.8145
+        ]
+      },
+      "properties": {
+        "title": "心愿碟 10",
+        "content": "这是第 10 个来自墨尔本的 心愿碟",
+        "type": "心愿碟",
+        "likes": 19
       }
     }
   ]
