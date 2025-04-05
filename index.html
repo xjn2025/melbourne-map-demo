@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>情绪地图 · 想见你 · Emoji版</title>
+  <title>情绪地图 · 黑胶唱片版</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
@@ -22,18 +22,39 @@
       z-index: 999;
     }
 
-    .emoji-marker {
-      font-size: 26px;
-      text-align: center;
-      line-height: 1;
-      cursor: pointer;
-      user-select: none;
-    }
-
     @keyframes pulse {
       0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
       50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.3; }
       100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    }
+
+    .vinyl {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #111 50%, #000 100%);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .vinyl.心语碟 {
+      box-shadow: 0 0 12px 4px #ffdd33aa;
+    }
+
+    .vinyl.心愿碟 {
+      box-shadow: 0 0 12px 4px #66ccffaa;
+    }
+
+    .vinyl::after {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: red;
+      border-radius: 50%;
+      z-index: 2;
     }
   </style>
 </head>
@@ -57,8 +78,7 @@ map.on('load', () => {
         const props = feature.properties;
 
         const el = document.createElement('div');
-        el.className = 'emoji-marker';
-        el.innerText = props.type === '心语碟' ? '💛💿' : '🩵💿';
+        el.className = 'vinyl ' + props.type;
 
         el.addEventListener('click', () => {
           const screenPos = map.project(coords);
