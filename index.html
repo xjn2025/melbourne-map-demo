@@ -23,26 +23,25 @@
     }
 
     .vinyl-marker {
-      width: 42px;
-      height: 42px;
-      background-image: url('https://i.imgur.com/RI4GzvZ.png');
-      background-size: contain;
-      background-position: center;
+      width: 48px;
+      height: 48px;
+      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAABaElEQVRoQ+2YwQ6CMAxEm9X+S2dyOBR3gZndN3mORe0KgZUvTo5cZfwTfgb6PY/ob2VQCyDQAzq6zZUtAKBLj8v3Q9JKv6MGY2lMI2bJiaQgjQAuwxTyCcIkbCmWrB0QSYmX7x0Mfgs+vOU2Nd0gbB+p5lULi2Qb1WyNtc2RmojvNtcTu39y7I1wcvWN+EKWTL5mYzO64sZYs3pbpVGqzTZqu7VjqbPBL8puHUl5XkRKWpo9pO1d5gWpa29XetCzF5Xga+zH8mCo8HJvJZoD1Vv6QCCdZQobKtdWkAAAAASUVORK5CYII=');
+      background-size: cover;
       background-repeat: no-repeat;
       border-radius: 50%;
-      animation: glowPulse 2.5s infinite ease-in-out;
+      transform-origin: center center;
     }
 
     .vinyl-marker.心语碟 {
-      box-shadow: 0 0 15px 5px #ffdd33aa;
+      box-shadow: 0 0 18px 4px #ffdd33aa;
     }
 
     .vinyl-marker.心愿碟 {
-      box-shadow: 0 0 15px 5px #66ccffaa;
+      box-shadow: 0 0 18px 4px #66ccffaa;
     }
 
     .vinyl-marker.spin {
-      animation: spin 1.5s linear infinite;
+      animation: spin 1.2s linear infinite;
     }
 
     @keyframes pulse {
@@ -53,11 +52,6 @@
 
     @keyframes spin {
       100% { transform: rotate(360deg); }
-    }
-
-    @keyframes glowPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
     }
   </style>
 </head>
@@ -81,6 +75,7 @@ map.on('load', () => {
         const props = feature.properties;
         const el = document.createElement('div');
         el.className = 'vinyl-marker ' + props.type;
+
         el.addEventListener('click', () => {
           el.classList.add('spin');
           const screenPos = map.project(coords);
@@ -98,7 +93,7 @@ map.on('load', () => {
             .addTo(map);
         });
 
-        new mapboxgl.Marker(el)
+        new mapboxgl.Marker({ element: el, anchor: 'center' })
           .setLngLat(coords)
           .addTo(map);
       });
