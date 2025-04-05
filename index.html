@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>情绪地图 · 黑胶固定版</title>
+  <title>情绪地图 · 黑胶最终版</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
@@ -33,29 +33,49 @@
       height: 28px;
       border-radius: 50%;
       background: radial-gradient(circle at center, #222 40%, #000 100%);
-      box-shadow: 0 0 0 6px #fff0;
+      box-shadow: 0 0 6px 2px #fff0;
+      animation: glowPulse 2.5s ease-in-out infinite;
+      position: relative;
     }
 
     .vinyl.心语碟 {
-      box-shadow: 0 0 0 6px #ffdd33aa;
+      box-shadow: 0 0 6px 2px #ffdd33aa;
     }
 
     .vinyl.心愿碟 {
-      box-shadow: 0 0 0 6px #66ccffaa;
+      box-shadow: 0 0 6px 2px #66ccffaa;
     }
 
     .vinyl::before {
       content: "";
       position: absolute;
-      width: 10px;
-      height: 10px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
-      border: 2px solid #991111;
+      background: #771111;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+    }
+
+    .vinyl::after {
+      content: "";
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border: 1px solid #fff;
+      border-radius: 50%;
       background: transparent;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 2;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
     }
   </style>
 </head>
@@ -69,6 +89,8 @@ const map = new mapboxgl.Map({
   center: [144.9631, -37.8136],
   zoom: 12
 });
+
+let activePopup = null;
 
 map.on('load', () => {
   fetch('data.geojson')
@@ -92,7 +114,11 @@ map.on('load', () => {
           document.body.appendChild(heart);
           setTimeout(() => heart.remove(), 600);
 
-          new mapboxgl.Popup()
+          if (activePopup) {
+            activePopup.remove();
+          }
+
+          activePopup = new mapboxgl.Popup()
             .setLngLat(coords)
             .setHTML(`<strong>${props.title}</strong><br>${props.content}`)
             .addTo(map);
