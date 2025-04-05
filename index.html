@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>情绪地图 · 想见你</title>
+  <title>情绪地图 · 想见你 · Emoji版</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
@@ -22,36 +22,18 @@
       z-index: 999;
     }
 
-    .vinyl-marker {
-      width: 48px;
-      height: 48px;
-      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAABaElEQVRoQ+2YwQ6CMAxEm9X+S2dyOBR3gZndN3mORe0KgZUvTo5cZfwTfgb6PY/ob2VQCyDQAzq6zZUtAKBLj8v3Q9JKv6MGY2lMI2bJiaQgjQAuwxTyCcIkbCmWrB0QSYmX7x0Mfgs+vOU2Nd0gbB+p5lULi2Qb1WyNtc2RmojvNtcTu39y7I1wcvWN+EKWTL5mYzO64sZYs3pbpVGqzTZqu7VjqbPBL8puHUl5XkRKWpo9pO1d5gWpa29XetCzF5Xga+zH8mCo8HJvJZoD1Vv6QCCdZQobKtdWkAAAAASUVORK5CYII=');
-      background-size: cover;
-      background-repeat: no-repeat;
-      border-radius: 50%;
-      transform-origin: center center;
-    }
-
-    .vinyl-marker.心语碟 {
-      box-shadow: 0 0 18px 4px #ffdd33aa;
-    }
-
-    .vinyl-marker.心愿碟 {
-      box-shadow: 0 0 18px 4px #66ccffaa;
-    }
-
-    .vinyl-marker.spin {
-      animation: spin 1.2s linear infinite;
+    .emoji-marker {
+      font-size: 26px;
+      text-align: center;
+      line-height: 1;
+      cursor: pointer;
+      user-select: none;
     }
 
     @keyframes pulse {
       0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
       50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.3; }
       100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
-    }
-
-    @keyframes spin {
-      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -73,11 +55,12 @@ map.on('load', () => {
       data.features.forEach(feature => {
         const coords = feature.geometry.coordinates;
         const props = feature.properties;
+
         const el = document.createElement('div');
-        el.className = 'vinyl-marker ' + props.type;
+        el.className = 'emoji-marker';
+        el.innerText = props.type === '心语碟' ? '💛💿' : '🩵💿';
 
         el.addEventListener('click', () => {
-          el.classList.add('spin');
           const screenPos = map.project(coords);
           const heart = document.createElement('div');
           heart.className = 'heartbeat';
