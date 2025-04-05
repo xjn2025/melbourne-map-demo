@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>情绪地图 · 想见你</title>
+  <title>情绪地图 · 黑胶固定版</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
@@ -11,7 +11,7 @@
     #map { position: absolute; top: 0; bottom: 0; width: 100%; }
 
     .heartbeat {
-      position: absolute;
+      position: fixed;
       width: 100px;
       height: 100px;
       border-radius: 50%;
@@ -27,6 +27,36 @@
       50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.3; }
       100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
     }
+
+    .vinyl {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, #222 40%, #000 100%);
+      box-shadow: 0 0 0 6px #fff0;
+    }
+
+    .vinyl.心语碟 {
+      box-shadow: 0 0 0 6px #ffdd33aa;
+    }
+
+    .vinyl.心愿碟 {
+      box-shadow: 0 0 0 6px #66ccffaa;
+    }
+
+    .vinyl::before {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid #991111;
+      background: transparent;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
   </style>
 </head>
 <body>
@@ -41,118 +71,38 @@ const map = new mapboxgl.Map({
 });
 
 map.on('load', () => {
-  map.addSource('posts', {
-    type: 'geojson',
-    data: './data.geojson'
-  });
+  fetch('data.geojson')
+    .then(res => res.json())
+    .then(data => {
+      data.features.forEach(feature => {
+        const coords = feature.geometry.coordinates;
+        const props = feature.properties;
 
-  map.addLayer({
-    id: 'posts-glow',
-    type: 'circle',
-    source: 'posts',
-    paint: {
-      'circle-radius': [
-        'interpolate', ['linear'], ['zoom'],
-        10, 20,
-        14, 45
-      ],
-      'circle-color': [
-        'match',
-        ['get', 'type'],
-        '心愿碟', '#66ccff',
-        '心语碟', '#ffdd33',
-        '#cccccc'
-      ],
-      'circle-opacity': 0.2,
-      'circle-blur': 0.8
-    }
-  });
+        const el = document.createElement('div');
+        el.className = 'vinyl ' + props.type;
 
-  map.addLayer({
-    id: 'posts-clickable',
-    type: 'circle',
-    source: 'posts',
-    paint: {
-      'circle-radius': [
-        'interpolate', ['linear'], ['zoom'],
-        10, 15,
-        14, 30
-      ],
-      'circle-color': '#000000',
-      'circle-opacity': 0
-    }
-  });
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const screenPos = map.project(coords);
+          const heart = document.createElement('div');
+          heart.className = 'heartbeat';
+          heart.style.left = `${screenPos.x}px`;
+          heart.style.top = `${screenPos.y}px`;
+          heart.style.background = props.type === '心愿碟' ? '#66ccff55' : '#ffdd3355';
+          document.body.appendChild(heart);
+          setTimeout(() => heart.remove(), 600);
 
-  map.addLayer({
-    id: 'posts-main',
-    type: 'circle',
-    source: 'posts',
-    paint: {
-      'circle-radius': [
-        'interpolate', ['linear'], ['zoom'],
-        10, 6,
-        14, 10
-      ],
-      'circle-color': [
-        'match',
-        ['get', 'type'],
-        '心愿碟', '#66ccff',
-        '心语碟', '#ffdd33',
-        '#ffffff'
-      ],
-      'circle-opacity': 0.95,
-      'circle-blur': 0.1
-    }
-  });
+          new mapboxgl.Popup()
+            .setLngLat(coords)
+            .setHTML(`<strong>${props.title}</strong><br>${props.content}`)
+            .addTo(map);
+        });
 
-  map.addLayer({
-    id: 'posts-highlight',
-    type: 'circle',
-    source: 'posts',
-    paint: {
-      'circle-radius': [
-        'interpolate', ['linear'], ['zoom'],
-        10, 2,
-        14, 4
-      ],
-      'circle-color': '#ffffff',
-      'circle-opacity': 0.3,
-      'circle-translate': [1.2, -1.2]
-    }
-  });
-
-  map.on('click', 'posts-clickable', (e) => {
-    const props = e.features[0].properties;
-    const center = map.project(e.lngLat);
-    const type = props.type;
-
-    const heart = document.createElement('div');
-    heart.className = 'heartbeat';
-    heart.style.left = `${center.x}px`;
-    heart.style.top = `${center.y}px`;
-    heart.style.background = type === '心愿碟' ? '#66ccff55' : '#ffdd3355';
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 600);
-
-    new mapboxgl.Popup()
-      .setLngLat(e.lngLat)
-      .setHTML(`<strong>${props.title}</strong><br>${props.content}`)
-      .addTo(map);
-  });
-
-  map.on('mouseenter', 'posts-clickable', () => {
-    map.getCanvas().style.cursor = 'pointer';
-  });
-  map.on('mouseleave', 'posts-clickable', () => {
-    map.getCanvas().style.cursor = '';
-  });
-
-  let fading = true;
-  setInterval(() => {
-    const opacity = fading ? 0.08 : 0.2;
-    map.setPaintProperty('posts-glow', 'circle-opacity', opacity);
-    fading = !fading;
-  }, 2000);
+        new mapboxgl.Marker({ element: el, anchor: 'center' })
+          .setLngLat(coords)
+          .addTo(map);
+      });
+    });
 });
 </script>
 </body>
