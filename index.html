@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>情绪地图 · 黑胶最终修正版</title>
+  <title>情绪地图 · 黑胶最终定版</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
@@ -35,10 +35,10 @@
       background: radial-gradient(circle at center, #222 40%, #000 100%);
       box-shadow: 0 0 6px 2px #fff0;
       animation: glowPulse 2.5s ease-in-out infinite;
-      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
+      transform: translate(0, 0); /* 强制不偏移 */
     }
 
     .vinyl.心语碟 {
@@ -50,11 +50,12 @@
     }
 
     .vinyl .center-ring {
-      width: 14px;
-      height: 14px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       background: #771111;
       position: relative;
+      z-index: 1;
     }
 
     .vinyl .center-ring::after {
@@ -121,10 +122,13 @@ map.on('load', () => {
             .addTo(map);
         });
 
-        // 使用 anchor: center, 并禁止 DOM transform
-        new mapboxgl.Marker({ element: el, anchor: 'center', offset: [0, 0] })
-          .setLngLat(coords)
-          .addTo(map);
+        new mapboxgl.Marker({
+          element: el,
+          anchor: 'center',
+          offset: [0, 0]
+        })
+        .setLngLat(coords)
+        .addTo(map);
       });
     });
 });
